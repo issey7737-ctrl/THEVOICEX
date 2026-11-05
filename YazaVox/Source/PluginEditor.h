@@ -148,6 +148,71 @@ private:
     std::vector<std::unique_ptr<Group>> groups;
 };
 
+
+//==============================================================================
+// Vue SIMPLE : grand bouton COMP + quelques reglages par rangee
+class AmberLAF : public LookAndFeel
+{
+public:
+    AmberLAF();
+    void drawRotarySlider (juce::Graphics&, int x, int y, int w, int h, float pos, float a0, float a1, juce::Slider&) override;
+    void drawToggleButton (juce::Graphics&, juce::ToggleButton&, bool over, bool down) override;
+    void drawButtonBackground (juce::Graphics&, juce::Button&, const juce::Colour&, bool over, bool down) override;
+    void drawComboBox (juce::Graphics&, int w, int h, bool down, int, int, int, int, juce::ComboBox&) override;
+};
+
+class AmberKnob : public juce::Component
+{
+public:
+    AmberKnob (YazaVoxProcessor&, int paramIndex, juce::String label, std::vector<int> gates = {}, std::function<void (float)> onChange = {}, bool showLabel = true);
+    void resized() override;
+    void refresh();
+    juce::Slider slider;
+    juce::Label name;
+private:
+    YazaVoxProcessor& proc;
+    std::vector<int> gates;
+    int idx;
+    std::unique_ptr<SliderAtt> att;
+};
+
+class SimpleView : public juce::Component
+{
+public:
+    SimpleView (YazaVoxProcessor&, std::function<void()> onPro);
+    ~SimpleView() override { setLookAndFeel (nullptr); }
+    void pushLevels (float inPk, float outPk);
+    void refresh();
+    void paint (juce::Graphics&) override;
+    void resized() override;
+private:
+    struct Row { juce::String title; int onIdx; std::vector<juce::Component*> items; juce::Rectangle<int> band; };
+    void setComp (float m01);
+    void selectPreset (int i);
+
+    YazaVoxProcessor& proc;
+    AmberLAF laf;
+    std::function<void()> onPro;
+
+    juce::Slider compMacro;
+    juce::Label compLabel;
+    juce::ToggleButton lowCut { "Low cut" };
+    std::unique_ptr<ButtonAtt> lowCutAtt;
+    juce::TextButton autoIn { "Auto input" }, prevBtn { "<" }, nextBtn { ">" }, proBtn { "PRO" };
+    juce::ComboBox presets;
+
+    std::vector<std::unique_ptr<juce::Component>> owned;
+    AmberKnob *inKnob = nullptr, *outKnob = nullptr;
+    std::vector<Row> rows;
+
+    float inLvl = 0.f, outLvl = 0.f, phase = 0.f;
+    bool syncing = false, measuring = false;
+    int measureFrames = 0;
+    float measurePk = 0.f;
+    juce::Rectangle<int> inBar, outBar, orbArea, titleArea;
+    juce::Image bg;
+};
+
 class YazaVoxEditor : public juce::AudioProcessorEditor, private juce::Timer
 {
 public:
@@ -164,7 +229,9 @@ private:
     LookAndFeel laf;
 
     juce::ComboBox presets;
-    juce::TextButton prevBtn { "<" }, nextBtn { ">" }, abBtn { "A" }, copyBtn { "A>B" }, resetBtn { "RESET" };
+    juce::TextButton prevBtn { "<" }, nextBtn { ">" }, abBtn { "A" }, copyBtn { "A>B" }, resetBtn { "RESET" }, simpleBtn { "SIMPLE" };
+    std::unique_ptr<SimpleView> simple;
+    void applyMode();
     juce::ToggleButton bypassBtn { "BYPASS" };
     std::unique_ptr<ButtonAtt> bypassAtt;
     KnobCell inKnob, outKnob;

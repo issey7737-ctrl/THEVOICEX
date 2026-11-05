@@ -153,7 +153,7 @@ int main()
         {
             Engine e; e.prepare (sr, 512);
             float v[Count]; defaults (v);
-            v[compOn] = v[eqOn] = v[fxOn] = v[dlyOn] = 0; v[revOn] = 1; v[revMode] = (float) mode; v[revMix] = 100; v[revDecay] = 2.0f; v[revPre] = 0;
+            v[compOn] = v[eqOn] = v[fxOn] = v[dlyOn] = 0; v[revOn] = 1; v[revMode] = (float) mode; v[revMix] = 100; v[revDecay] = 2.0f; v[revPre] = 0; v[revDuck] = 0;
             e.setParams (v);
             const size_t N = (size_t) (sr * 6);
             std::vector<float> L (N, 0.f), R (N, 0.f);
@@ -165,6 +165,26 @@ int main()
             std::printf ("     mode %d : rms 0.1-0.3 s = %.1f dB, 1.1-1.3 s = %.1f dB, 4.5-5 s = %.1f dB\n", mode, linToDb (e1), linToDb (e2), linToDb (e3));
             check (e1 > 1e-4 && e2 < e1 && e3 < e2, "reverb : niveau present et decroissant");
         }
+    }
+
+    // 5b) ducking de reverb : le niveau de la reverb baisse pendant la voix
+    {
+        const double sr = 48000;
+        auto x = makeVoice (sr, 4.0, 0.6f);
+        double lv[2];
+        for (int k = 0; k < 2; ++k)
+        {
+            Engine e; e.prepare (sr, 512);
+            float v[Count]; defaults (v);
+            v[compOn] = v[eqOn] = v[fxOn] = v[dlyOn] = 0; v[revOn] = 1; v[revMix] = 100; v[revDuck] = k ? 100.f : 0.f;
+            e.setParams (v);
+            std::vector<float> L = x, R = x;
+            run (e, L, R, 512);
+            double s = 0; for (size_t i = (size_t) (2 * sr); i < L.size(); ++i) s += (double) (L[i] - x[i]) * (L[i] - x[i]);
+            lv[k] = std::sqrt (s / (double) (L.size() - (size_t) (2 * sr)));
+        }
+        std::printf ("     reverb wet rms : duck 0 = %.4f, duck 100 = %.4f\n", lv[0], lv[1]);
+        check (lv[1] < lv[0] * 0.8, "reverb ducking actif");
     }
 
     // 6) EQ : reponse en frequence conforme

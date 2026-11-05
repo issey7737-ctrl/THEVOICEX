@@ -46,6 +46,7 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
     yv::Engine engine;
+    std::atomic<bool> uiSimple { true };
 
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();

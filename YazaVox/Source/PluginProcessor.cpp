@@ -199,6 +199,7 @@ void YazaVoxProcessor::getStateInformation (juce::MemoryBlock& destData)
     auto state = apvts.copyState();
     state.setProperty ("ab", abActive, nullptr);
     state.setProperty ("preset", currentPreset, nullptr);
+    state.setProperty ("simple", uiSimple.load(), nullptr);
     for (int s = 0; s < 2; ++s)
         if (slotValid[(size_t) s])
         {
@@ -220,6 +221,7 @@ void YazaVoxProcessor::setStateInformation (const void* data, int sizeInBytes)
             juce::StringArray a; a.addTokens (vt.getProperty ("slot" + juce::String (s)).toString(), ",", "");
             if (a.size() == Count) { for (int i = 0; i < Count; ++i) slots[(size_t) s][(size_t) i] = a[i].getFloatValue(); slotValid[(size_t) s] = true; }
         }
+        uiSimple = (bool) vt.getProperty ("simple", true);
         abActive = juce::jlimit (0, 1, (int) vt.getProperty ("ab", 0));
         currentPreset = juce::jlimit (0, (int) presetNames().size() - 1, (int) vt.getProperty ("preset", 0));
         apvts.replaceState (vt);

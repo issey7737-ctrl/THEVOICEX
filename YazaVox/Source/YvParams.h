@@ -90,12 +90,12 @@ struct Def
     X(revDecay,   "revDecay",   "DECAY",    0.2, 10,  1.8,  0.01, 0.5, KFloat,  " s",       MRev,    "TYPE") \
     X(revPre,     "revPre",     "PRE-DELAY", 0,  250, 20,   1,    1,   KFloat,  " ms",      MRev,    "TYPE") \
     X(revSize,    "revSize",    "SIZE",     0,   100, 50,   1,    1,   KFloat,  " %",       MRev,    "TYPE") \
+    X(revDuck,    "revDuck",    "DUCK",     0,   100, 30,   1,    1,   KFloat,  " %",       MRev,    "MIX") \
+    X(revMix,     "revMix",     "MIX",      0,   100, 0,    1,    1,   KFloat,  " %",       MRev,    "MIX") \
     X(revDamp,    "revDamp",    "DAMPING",  0,   100, 50,   1,    1,   KFloat,  " %",       MRev,    "TONE") \
     X(revWidth,   "revWidth",   "WIDTH",    0,   100, 100,  1,    1,   KFloat,  " %",       MRev,    "TONE") \
     X(revLow,     "revLow",     "LOW CUT",  20,  1000, 150, 1,    0.5, KFloat,  " Hz",      MRev,    "TONE") \
-    X(revHigh,    "revHigh",    "HIGH CUT", 1000, 20000, 9000, 10, 0.5, KFloat, " Hz",      MRev,    "TONE") \
-    X(revMix,     "revMix",     "MIX",      0,   100, 0,    1,    1,   KFloat,  " %",       MRev,    "MIX")
-
+    X(revHigh,    "revHigh",    "HIGH CUT", 1000, 20000, 9000, 10, 0.5, KFloat, " Hz",      MRev,    "TONE")
 #define X(name, id, label, lo, hi, def, step, skew, kind, unit, mod, grp) name,
 enum P : int { YV_LIST(X) Count };
 #undef X

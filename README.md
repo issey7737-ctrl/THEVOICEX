@@ -3,7 +3,7 @@
 - **VoxChain** : chaîne voix originale — EQ 4 bandes + low-cut, de-esser, compresseur, saturation, doubleur, delay (ping-pong), reverb, 6 presets, interface animée. Dossier `VoxChain/`.
   Le moteur de VoxChain est testé hors-ligne (delay, compression, reverb, blocs variables). L'interface n'a pas pu être affichée de mon côté : à vérifier à l'ouverture.
 
-- **YAZA VOX** : suite vocale pro — 5 modules indépendants (COMP 2 étages + parallèle, EQ 4 bandes + analyseur, FX : de-esser / saturation / doubleur / chorus / téléphone / largeur, DLY synchro tempo ping-pong avec ducking, REV Room/Plate/Hall/Spring), 20 presets, A/B, Reset, Bypass, interface rouge/noire redimensionnable. Dossier `YazaVox/`. Moteur testé hors-ligne (44,1/48/88,2/96 kHz, blocs 128 à 2048) : `YazaVox/tests_yv.cpp`.
+- **YAZA VOX** : suite vocale pro — 5 modules indépendants (COMP 2 étages + parallèle, EQ 4 bandes + analyseur, FX : de-esser / saturation / doubleur / chorus / téléphone / largeur, DLY synchro tempo ping-pong avec ducking, REV Room/Plate/Hall/Spring), 20 presets, A/B, Reset, Bypass, interface rouge/noire redimensionnable, avec une vue SIMPLE (un grand bouton COMP + quelques réglages par rangée, bouton Auto input) et une vue PRO détaillée (bouton PRO / SIMPLE pour passer de l'une à l'autre). Dossier `YazaVox/`. Moteur testé hors-ligne (44,1/48/88,2/96 kHz, blocs 128 à 2048) : `YazaVox/tests_yv.cpp`.
 
 Le build GitHub produit les trois : l'artefact **VST3-Windows** contient `AutoMaster.vst3`, `VoxChain.vst3` et `YAZA VOX.vst3` (copie les deux dans `C:\Program Files\Common Files\VST3`).
 

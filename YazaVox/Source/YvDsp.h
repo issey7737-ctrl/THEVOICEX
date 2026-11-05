@@ -526,7 +526,7 @@ public:
         }
         for (auto& x : lp) x.reset();
         for (int i = 0; i < N; ++i) ph[i] = (double) i / N;
-        mode = -1; pendingMode = 1; fade = 0; lastBlockMode = -1;
+        mode = -1; pendingMode = 1; fade = 0; lastBlockMode = -1; env = 0; duckG = 1;
         lfoPh = 0;
     }
 
@@ -539,6 +539,9 @@ public:
         damp = clampd (v[revDamp] / 100.0, 0.0, 1.0);
         width = clampd (v[revWidth] / 100.0, 0.0, 1.0);
         mix = clampd (v[revMix] / 100.0, 0.0, 1.0);
+        duck = clampd (v[revDuck] / 100.0, 0.0, 1.0);
+        envRel = std::exp (-1.0 / (0.25 * sr));
+        duckSm = 1.0 - std::exp (-1.0 / (0.006 * sr));
         if (std::abs (v[revLow] - lowC) > 0.5 || std::abs (v[revHigh] - highC) > 0.5)
         {
             lowC = v[revLow]; highC = v[revHigh];
@@ -613,7 +616,13 @@ public:
         const double m = 0.5 * (oL + oR), s = 0.5 * (oL - oR) * width;
         oL = lpF[0].process (hpF[0].process (m + s));
         oR = lpF[1].process (hpF[1].process (m - s));
-        wl = oL * fade * wetScale; wr = oR * fade * wetScale;
+        // ducking : la reverb baisse quand la voix chante, et remonte dans les silences
+        const double lvl = std::max (std::abs (l), std::abs (r));
+        env = lvl > env ? lvl : lvl + (env - lvl) * envRel;
+        const double e = clampd ((linToDb (env) + 50.0) / 30.0, 0.0, 1.0);
+        const double tg = dbToLin (-duck * 18.0 * e);
+        duckG += (tg - duckG) * (tg < duckG ? duckSm : 0.0008);
+        wl = oL * fade * wetScale * duckG; wr = oR * fade * wetScale * duckG;
     }
 
 private:
@@ -668,6 +677,7 @@ private:
         }
     }
 
+    double duck = 0, env = 0, envRel = 0, duckG = 1, duckSm = 0.1;
     double sr = 48000, decay = 1.8, preS = 0, sizeScale = 1, damp = 0.5, width = 1, mix = 0, lowC = -1, highC = -1;
     double lenS[N] {}, gain[N] {}, ph[N] {}, modDepth = 0, modRate = 0.5, dampA = 0.5, wetScale = 1, fade = 0, lfoPh = 0;
     double erT[6] {}, erG[6] {};
